@@ -1,0 +1,346 @@
+-- MySQL dump 10.13  Distrib 5.6.22, for osx10.8 (x86_64)
+--
+-- Host: localhost    Database: FinalProject
+-- ------------------------------------------------------
+-- Server version	5.6.22
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `artist`
+--
+
+DROP TABLE IF EXISTS `artist`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `artist` (
+  `artist_id` varchar(32) NOT NULL,
+  `artist_name` varchar(256) DEFAULT NULL,
+  `hottness` float NOT NULL,
+  `familiarity` float NOT NULL,
+  PRIMARY KEY (`artist_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `artist`
+--
+
+# Removed insert statements for brevity
+
+LOCK TABLES `artist` WRITE;
+/*!40000 ALTER TABLE `artist` DISABLE KEYS */;
+/*!40000 ALTER TABLE `artist` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `artist_genres`
+--
+
+DROP TABLE IF EXISTS `artist_genres`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `artist_genres` (
+  `artist_id` varchar(32) NOT NULL,
+  `genre` varchar(256) NOT NULL DEFAULT '',
+  PRIMARY KEY (`artist_id`,`genre`),
+  CONSTRAINT `artist_genres_ibfk_1` FOREIGN KEY (`artist_id`) REFERENCES `artist` (`artist_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `artist_genres`
+--
+
+# Removed insert statements for brevity
+
+LOCK TABLES `artist_genres` WRITE;
+/*!40000 ALTER TABLE `artist_genres` DISABLE KEYS */;
+/*!40000 ALTER TABLE `artist_genres` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `track`
+--
+
+DROP TABLE IF EXISTS `track`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `track` (
+  `track_id` varchar(128) NOT NULL,
+  `title` varchar(256) DEFAULT NULL,
+  `artist_id` varchar(32) DEFAULT NULL,
+  `artist_name` varchar(256) NOT NULL,
+  `album` varchar(256) DEFAULT NULL,
+  `duration` float NOT NULL,
+  `year` int(11) NOT NULL,
+  PRIMARY KEY (`track_id`),
+  KEY `artist_id` (`artist_id`),
+  CONSTRAINT `track_ibfk_1` FOREIGN KEY (`artist_id`) REFERENCES `artist` (`artist_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `track`
+--
+
+# Removed insert statements for brevity
+
+LOCK TABLES `track` WRITE;
+/*!40000 ALTER TABLE `track` DISABLE KEYS */;
+/*!40000 ALTER TABLE `track` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `track_analysis`
+--
+
+DROP TABLE IF EXISTS `track_analysis`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `track_analysis` (
+  `track_id` varchar(128) NOT NULL,
+  `tempo` float NOT NULL,
+  `tonality` int(11) NOT NULL,
+  `danceability` float NOT NULL,
+  `hottness` float NOT NULL,
+  PRIMARY KEY (`track_id`),
+  CONSTRAINT `track_analysis_ibfk_1` FOREIGN KEY (`track_id`) REFERENCES `track` (`track_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `track_analysis`
+--
+
+# Removed insert statements for brevity
+
+LOCK TABLES `track_analysis` WRITE;
+/*!40000 ALTER TABLE `track_analysis` DISABLE KEYS */;
+/*!40000 ALTER TABLE `track_analysis` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+
+# DDL Specification
+CREATE TABLE artist (
+    artist_id   VARCHAR(32) PRIMARY KEY,
+        artist_name VARCHAR(64) NOT NULL,
+            hottness    FLOAT(5)        NOT NULL,
+                familiarity FLOAT(5)        NOT NULL
+                );
+
+CREATE TABLE artist_genres (
+    artist_id   VARCHAR(32) NOT NULL,
+        genre       VARCHAR(32) NOT NULL,
+            FOREIGN KEY(‘artist_id’) REFERENCES artist (‘artist_id’)
+            );
+
+CREATE TABLE track (
+    track_id    VARCHAR(128)    PRIMARY KEY,
+        title       VARCHAR(128)    NOT NULL,
+            album       VARCHAR(128)    NOT NULL,
+                artist_id   VARCHAR(32) NOT NULL,
+                    duration    FLOAT(5)        NOT NULL,
+                        year        INT         NOT NULL,
+                            FOREIGN KEY(‘artist_id’) REFERENCES artist(‘artist_id’)
+                            );
+
+CREATE TABLE track_analysis (
+    track_id    VARCHAR(128)    PRIMARY KEY,
+        tempo       FLOAT(2)        NOT NULL,
+            tonality        INT         NOT NULL,
+                danceability    FLOAT(2)        NOT NULL,
+                    hottness    FLOAT(2)        NOT NULL,
+                        FOREIGN KEY(‘track_id’) REFERENCES tracks(‘track_id’)
+                        );
+
+CREATE TABLE cover_art (
+    track_id    VARCHAR(128)    PRIMARY KEYa,
+        pic_location    VARCHAR(256)    NULL,
+            FOREIGN KEY(‘track_id’) REFERENCES tracks(‘track_id’)
+            );
+
+# Stored Procedures
+
+#0 List songs by artist
+DELIMITER //
+CREATE PROCEDURE ArtistSong(IN artistin VARCHAR(256))
+BEGIN
+    SELECT *
+        FROM track as t, artist as a
+            WHERE t.artist_id = a.artist_id AND a.artist_name=artistin;
+            END //
+            DELIMITER ;
+
+            List of SQL statements:
+#1 List all songs from a specific year.
+            DELIMITER //
+            CREATE PROCEDURE SongFromYear(IN yearin INT)
+            BEGIN
+                SELECT *
+                    FROM track as t
+                        WHERE t.year = yearin;
+                        END //
+                        DELIMITER ;
+
+#2 songs from a specific decade
+DELIMITER //
+CREATE PROCEDURE SongFromDecade(IN decade INT)
+BEGIN
+    SELECT *
+        FROM track as t
+            WHERE t.year >= (decade-(decade%10)) AND t.year < (decade-(decade%10)) + 10;
+            END //
+            DELIMITER ;
+
+#3 List All Songs in a specific genre
+DELIMITER //
+CREATE PROCEDURE SongOfGenre(IN genrein VARCHAR(256))
+BEGIN
+    SELECT *
+        FROM track as t, artist_genres as a
+            WHERE t.artist_id=a.artist_id AND a.genre=genrein;
+            END //
+            DELIMITER ;
+
+#4 50 most popular songs.
+DELIMITER //
+CREATE PROCEDURE SongTop50()
+BEGIN
+    SELECT *
+        FROM track as t, track_analysis as a
+            WHERE t.track_id = a.track_id 
+                ORDER BY a.hottness DESC LIMIT 50;
+                END //
+                DELIMITER ;
+
+#5 List songs with a specific tempo
+DELIMITER //
+CREATE PROCEDURE SpecificTempo(IN tempoin FLOAT(2))
+BEGIN
+    SELECT *
+        FROM track as t, track_analysis as a
+            WHERE t.track_id=a.track_id AND a.tempo=tempoin;
+            END //
+            DELIMITER ;
+
+#6 songs within a tempo range.
+DELIMITER //
+CREATE PROCEDURE SongWithinTempoRange(IN min FLOAT(2), IN max FLOAT(2))
+BEGIN
+    SELECT *
+        FROM track as t, track_analysis as a
+            WHERE t.track_id = a.track_id AND a.tempo >= min AND a.tempo <= max;
+            END //
+            DELIMITER ;
+
+#7 List Songs close to a specific tempo (+/- 3 BPM)
+DELIMITER //
+CREATE PROCEDURE CloseToTempo(IN tempoin FLOAT(2))
+BEGIN
+    SELECT *
+        FROM track as t, track_analysis as a
+            WHERE t.track_id=a.track_id AND (a.tempo<=tempoin+3 AND a.tempo>=tempoin-3);
+            END //
+            DELIMITER ;
+
+#8 songs with a specific key.
+DELIMITER //
+CREATE PROCEDURE SongWithKey(IN keyin INT)
+BEGIN
+    SELECT *
+        FROM track as t, track_analysis as a
+            WHERE t.track_id = a.track_id AND a.tonality = keyin;
+            END //
+            DELIMITER ;
+
+#9 Song in a close key (+/- 7 Mod 12)
+DELIMITER //
+CREATE PROCEDURE SongCloseToKey(IN keyin INT)
+BEGIN
+    SELECT *
+        FROM track as t, track_analysis as a
+            WHERE t.track_id = a.track_id AND (a.tonality=(keyin - 7)%12 OR a.tonality=(keyin + 7)%12);
+            END //
+            DELIMITER ;
+
+#11 Fast Dance song
+DELIMITER //
+CREATE PROCEDURE FastDanceSong()
+BEGIN
+    SELECT *
+        FROM track as t, track_analysis as a
+            WHERE t.track_id=a.track_id AND a.tempo > 120 AND a.danceability > .6;
+            END //
+            DELIMITER ;
+
+#12 songs that are danceable from the 80’s and sort by year, then popularity.
+DELIMITER //
+CREATE PROCEDURE SongDance80()
+BEGIN
+    SELECT *
+        FROM track as t, track_analysis as a
+            WHERE t.track_id = a.track_id AND t.year >= 1980 AND t.year < 1990 
+                    AND a.danceability >= 0.5
+                        ORDER BY t.year, a.hottness DESC;
+                        END //
+                        DELIMITER ;
+
+#13 Electronic song between 128 and 140 BPM
+DELIMITER //
+CREATE PROCEDURE  ElectronicDance()
+BEGIN
+    SELECT *
+        FROM track as t, track_analysis as a, artist_genres as g
+            WHERE t.track_id=a.track_id AND a.tempo<=140 AND a.tempo>128 AND 
+            g.artist_id=t.artist_id AND g.genre='electronic';
+            END //
+            DELIMITER ;
+
+#14 all songs that are at least semi-danceable (>= .5 danceability) and group by key and sort by danceability.
+DELIMITER //
+CREATE PROCEDURE SongSemiDance()
+BEGIN
+    SELECT *
+        FROM track as t, track_analysis as a
+            WHERE t.track_id = a.track_id AND a.danceability > 0.5
+                GROUP BY a.tonality
+                    ORDER BY a.danceability DESC;
+                    END //
+                    DELIMITER ;
+
+#15 (close in tempo, similar key)
+DELIMITER //
+CREATE PROCEDURE MashupSong(IN tempoin FLOAT(2), IN keyin INT)
+BEGIN
+    SELECT *
+        FROM track as t, track_analysis as a
+            WHERE t.track_id=a.track_id AND (a.tonality=(keyin - 7)%12 OR a.tonality=(keyin + 7)%12) AND (a.tempo<=tempoin+3 AND a.tempo>=tempoin-3);
+            END //
+            DELIMITER ;
+
+
+
+
+
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2014-12-18 14:14:41
